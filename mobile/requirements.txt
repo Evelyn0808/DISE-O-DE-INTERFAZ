@@ -1,0 +1,4 @@
+# Dependencias para SEGURIDAD SOS (Versión Móvil KivyMD)
+kivy>=2.3.0
+kivymd>=1.2.0
+pillow>=10.0.0

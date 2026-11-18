@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguridad SOS - Panel Web de Escritorio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0" rel="stylesheet">
+    <style>
+        :root {
+            /* Paleta de colores sólidos (Figma) */
+            --bg-main: #111A4D;          /* Fondo principal */
+            --bg-input-nav: #1A275E;     /* Campos y navegación */
+            --bg-card: #243575;          /* Tarjetas y botones secundarios */
+            --border-input: #5266AD;     /* Bordes de campos */
+            --text-primary: #FFFFFF;     /* Títulos y texto principal */
+            --text-secondary: #CDD9FF;   /* Texto secundario y descripciones */
+            --accent-cyan: #79F2ED;      /* Enlaces y detalles destacados */
+            --btn-primary: #D9165D;      /* Botones principales e indicadores activos */
+            --zone-alert: #4C1D95;       /* Zonas de alerta y estados activos */
+            --sos-red: #E11D48;          /* Botón circular SOS */
+            --action-blue: #1665C1;      /* Acciones de llamar y compartir ubicación */
+
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-pill: 100px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Utilidades */
+        .text-cyan { color: var(--accent-cyan); }
+        .text-secondary { color: var(--text-secondary); }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .mt-12 { margin-top: 12px; }
+        .mt-16 { margin-top: 16px; }
+        .mt-24 { margin-top: 24px; }
+
+        /* =========================================================
+           1. VISTA DE AUTENTICACIÓN (ESCRITORIO CENTRADO 2 COLUMNAS)
+           ========================================================= */
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 960px;
+            background-color: var(--bg-input-nav);
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-xl);
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            overflow: hidden;
+        }
+
+        .auth-brand-panel {
+            background-color: var(--zone-alert);
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand-logo .material-symbols-rounded {
+            font-size: 38px;
+            color: var(--accent-cyan);
+        }
+        .brand-logo h1 {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 0.6px;
+        }
+
+        .brand-features {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .brand-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .auth-form-panel {
+            padding: 44px 42px;
+        }
+
+        .md3-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .tab-btn {
+            flex: 1;
+            background-color: var(--bg-card);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: var(--radius-pill);
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .tab-btn.active {
+            background-color: var(--btn-primary);
+            color: var(--text-primary);
+        }
+
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+
+        /* Campos de texto */
+        .md3-text-field {
+            position: relative;
+            background-color: var(--bg-main);
+            border: 1.5px solid var(--border-input);
+            border-radius: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            padding: 8px 14px;
+        }
+        .md3-text-field:focus-within {
+            border-color: var(--accent-cyan);
+        }
+        .md3-text-field .icon {
+            color: var(--accent-cyan);
+            margin-right: 12px;
+        }
+        .md3-text-field input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            width: 100%;
+            padding: 14px 0 4px;
+            font-size: 15px;
+            outline: none;
+        }
+        .md3-text-field label {
+            position: absolute;
+            left: 50px;
+            top: 17px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            transition: 0.2s;
+            pointer-events: none;
+        }
+        .md3-text-field input:focus ~ label,
+        .md3-text-field input:not(:placeholder-shown) ~ label {
+            top: 5px;
+            font-size: 11px;
+            color: var(--accent-cyan);
+        }
+
+        /* Botones */
+        .md3-btn-primary {
+            background-color: var(--btn-primary);
+            color: var(--text-primary);
+            border: none;
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: var(--radius-pill);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .md3-btn-secondary {
+            background-color: var(--bg-card);
+            color: var(--accent-cyan);
+            border: none;
+            padding: 13px 20px;
+            border-radius: var(--radius-pill);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* =========================================================
+           2. LAYOUT PRINCIPAL DE ESCRITORIO (SIDEBAR + CONTENIDO)
+           ========================================================= */
+        .dashboard-layout {
+            display: none;
+            min-height: 100vh;
+        }
+        .dashboard-layout.active {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+        }
+
+        /* Barra Lateral */
+        .sidebar {
+            background-color: var(--bg-input-nav);
+            border-right: 1px solid var(--border-input);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 32px;
+        }
+
+        .nav-link {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 14px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            width: 100%;
+        }
+        .nav-link:hover {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .nav-link.active {
+            background-color: var(--btn-primary);
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* Área de Contenido Principal */
+        .main-content {
+            padding: 32px 40px;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--bg-card);
+        }
+
+        .status-pill {
+            background-color: var(--zone-alert);
+            color: var(--accent-cyan);
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Grid de Inicio (2 Columnas) */
+        .home-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .sos-zone {
+            background-color: var(--zone-alert);
+            border-radius: var(--radius-xl);
+            padding: 36px 24px;
+            text-align: center;
+        }
+        .sos-wrapper {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .progress-ring {
+            position: absolute;
+            inset: 0;
+            width: 220px;
+            height: 220px;
+            transform: rotate(-90deg);
+        }
+        .progress-ring-circle {
+            fill: transparent;
+            stroke: var(--accent-cyan);
+            stroke-width: 7;
+            stroke-dasharray: 628.32;
+            stroke-dashoffset: 628.32;
+            transition: stroke-dashoffset 0.05s linear;
+        }
+        .sos-btn {
+            width: 186px;
+            height: 186px;
+            border-radius: 50%;
+            background-color: var(--sos-red);
+            color: var(--text-primary);
+            border: 6px solid #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+            user-select: none;
+        }
+        .sos-btn:active { transform: scale(0.96); }
+        .sos-text { font-size: 48px; font-weight: 900; line-height: 1; }
+        .sos-subtext { font-size: 12px; font-weight: 700; margin-top: 6px; letter-spacing: 1px; }
+
+        /* Tarjetas y Acciones */
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--accent-cyan);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .action-card {
+            background-color: var(--action-blue);
+            color: var(--text-primary);
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+        }
+        .md3-card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+        .contact-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bg-input-nav);
+        }
+        .contact-row:last-child { border-bottom: none; }
+
+        /* Grid de Cámaras (3 Columnas en PC) */
+        .cameras-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .md3-chip-group {
+            display: flex;
+            gap: 10px;
+        }
+        .md3-chip {
+            background-color: var(--bg-card);
+            color: var(--text-secondary);
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .md3-chip.active {
+            background-color: var(--btn-primary);
+            color: var(--text-primary);
+        }
+        .cameras-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .camera-feed {
+            height: 180px;
+            background-color: var(--bg-input-nav);
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+        .status-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background-color: var(--zone-alert);
+            color: var(--accent-cyan);
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .status-badge.rec {
+            background-color: var(--sos-red);
+            color: var(--text-primary);
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--accent-cyan);
+            cursor: pointer;
+        }
+
+        /* Grid de Perfil (2 Columnas) */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .profile-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--bg-input-nav);
+        }
+        .profile-item:last-child { border-bottom: none; }
+
+        /* Overlay de Alerta SOS */
+        .alert-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: var(--sos-red);
+            color: var(--text-primary);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            z-index: 300;
+            gap: 18px;
+        }
+        .alert-overlay.active { display: flex; }
+
+        /* Toast */
+        .md3-toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background-color: var(--zone-alert);
+            color: var(--text-primary);
+            border: 1px solid var(--accent-cyan);
+            padding: 14px 20px;
+            border-radius: var(--radius-pill);
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 400;
+        }
+        .md3-toast.show { display: flex; }
+
+        /* Adaptación para pantallas medianas */
+        @media (max-width: 1024px) {
+            .cameras-grid { grid-template-columns: repeat(2, 1fr); }
+            .home-grid, .profile-grid, .auth-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =========================================================
+         PANTALLA DE AUTENTICACIÓN (LOGIN / REGISTRO)
+         ========================================================= -->
+    <div id="auth-view" class="auth-wrapper">
+        <div class="auth-container">
+            <div class="auth-brand-panel">
+                <div>
+                    <div class="brand-logo">
+                        <span class="material-symbols-rounded">gpp_good</span>
+                        <h1>SEGURIDAD SOS</h1>
+                    </div>
+                    <p class="text-secondary mt-12">Tu tranquilidad empieza aquí. Panel de control web para monitoreo y emergencias en tiempo real.</p>
+
+                    <div class="brand-features">
+                        <div class="brand-feature-item">
+                            <span class="material-symbols-rounded text-cyan">emergency_share</span>
+                            <span>Alerta SOS de 3 segundos con ubicación GPS</span>
+                        </div>
+                        <div class="brand-feature-item">
+                            <span class="material-symbols-rounded text-cyan">videocam</span>
+                            <span>Monitoreo simultáneo de cámaras de seguridad</span>
+                        </div>
+                        <div class="brand-feature-item">
+                            <span class="material-symbols-rounded text-cyan">lock</span>
+                            <span>Acceso protegido con PIN de seguridad de 4 dígitos</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-secondary">Versión Web Escritorio • Material Design 3</p>
+            </div>
+
+            <div class="auth-form-panel">
+                <div class="md3-tabs">
+                    <button type="button" class="tab-btn" id="tab-login" onclick="switchAuthTab('login')">
+                        <span class="material-symbols-rounded" style="font-size:18px;">login</span>
+                        INICIAR SESIÓN
+                    </button>
+                    <button type="button" class="tab-btn active" id="tab-register" onclick="switchAuthTab('register')">
+                        <span class="material-symbols-rounded" style="font-size:18px;">person_add</span>
+                        CREAR CUENTA
+                    </button>
+                </div>
+
+                <!-- Crear Cuenta -->
+                <div id="form-register" class="auth-form active">
+                    <h2 style="font-size:26px;">Crea tu cuenta</h2>
+                    <p class="text-secondary text-sm mt-12">Completa tus datos para activar tu red de apoyo.</p>
+                    <form class="mt-24" onsubmit="handleAuthSubmit(event, 'register')">
+                        <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">person</span>
+                            <input type="text" id="reg-name" placeholder=" " required>
+                            <label>Nombre Completo</label>
+                        </div>
+                        <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">smartphone</span>
+                            <input type="tel" id="reg-phone" placeholder=" " required>
+                            <label>Teléfono Móvil</label>
+                        </div>
+                        <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">lock</span>
+                            <input type="password" id="reg-pin" placeholder=" " maxlength="4" pattern="[0-9]{4}" inputmode="numeric" required>
+                            <label>PIN de Seguridad (4 dígitos)</label>
+                        </div>
+                        <button type="submit" class="md3-btn-primary mt-16">
+                            <span class="material-symbols-rounded">shield</span>
+                            CREAR MI CUENTA SOS
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Iniciar Sesión -->
+                <div id="form-login" class="auth-form">
+                    <h2 style="font-size:26px;">Bienvenido de nuevo</h2>
+                    <p class="text-secondary text-sm mt-12">Ingresa tu número y PIN para acceder al panel.</p>
+                    <form class="mt-24" onsubmit="handleAuthSubmit(event, 'login')">
+                        <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">smartphone</span>
+                            <input type="tel" id="login-phone" placeholder=" " required>
+                            <label>Teléfono Móvil</label>
+                        </div>
+                        <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">lock</span>
+                            <input type="password" id="login-pin" placeholder=" " maxlength="4" pattern="[0-9]{4}" inputmode="numeric" required>
+                            <label>PIN de Seguridad (4 dígitos)</label>
+                        </div>
+                        <p class="text-cyan text-sm" style="text-align:right; cursor:pointer;" onclick="showToast('Código de recuperación enviado por SMS')">¿Olvidaste tu PIN?</p>
+                        <button type="submit" class="md3-btn-primary mt-16">
+                            <span class="material-symbols-rounded">lock_open</span>
+                            INICIAR SESIÓN
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         PANEL PRINCIPAL DE ESCRITORIO (SIDEBAR + VISTAS)
+         ========================================================= -->
+    <div id="dashboard-view" class="dashboard-layout">
+        <!-- Barra Lateral -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand-logo">
+                    <span class="material-symbols-rounded" style="font-size:30px; color:var(--btn-primary);">gpp_good</span>
+                    <h1 style="font-size:18px;">SEGURIDAD SOS</h1>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <button type="button" class="nav-link active" id="nav-home" onclick="switchView('home')">
+                        <span class="material-symbols-rounded">shield_alert</span>
+                        Inicio / Alerta SOS
+                    </button>
+                    <button type="button" class="nav-link" id="nav-cameras" onclick="switchView('cameras')">
+                        <span class="material-symbols-rounded">videocam</span>
+                        Mis Cámaras
+                    </button>
+                    <button type="button" class="nav-link" id="nav-profile" onclick="switchView('profile')">
+                        <span class="material-symbols-rounded">settings</span>
+                        Mi Perfil
+                    </button>
+                </nav>
+            </div>
+
+            <button type="button" class="md3-btn-secondary" style="width:100%;" onclick="logout()">
+                <span class="material-symbols-rounded">logout</span>
+                Cerrar sesión
+            </button>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h2 id="topbar-greeting" style="font-size:26px;">Hola, Usuario</h2>
+                    <p class="text-secondary text-sm">Tu red de apoyo y monitoreo está conectada.</p>
+                </div>
+                <div class="status-pill">
+                    <span class="material-symbols-rounded" style="font-size:18px;">verified_user</span>
+                    Protección GPS Activa
+                </div>
+            </header>
+
+            <!-- VISTA: INICIO / SOS -->
+            <section id="view-home" class="view-section active">
+                <div class="home-grid">
+                    <!-- Columna Izquierda: Botón SOS -->
+                    <div class="sos-zone">
+                        <div class="sos-wrapper">
+                            <svg class="progress-ring">
+                                <circle id="progress-circle" class="progress-ring-circle" cx="110" cy="110" r="100"></circle>
+                            </svg>
+                            <button type="button" class="sos-btn" id="btnSos">
+                                <span class="sos-text">SOS</span>
+                                <span class="sos-subtext">PEDIR AYUDA</span>
+                            </button>
+                        </div>
+                        <p id="sos-status-label" style="font-weight:700; font-size:16px;">Mantén pulsado 3 segundos</p>
+                        <p class="text-secondary text-sm mt-12">Envía una alerta inmediata y tus coordenadas GPS a la policía y a tus contactos de emergencia.</p>
+                    </div>
+
+                    <!-- Columna Derecha: Accesos Rápidos y Contactos -->
+                    <div>
+                        <h3 class="section-title">ACCESOS RÁPIDOS</h3>
+                        <div class="actions-grid">
+                            <button type="button" class="action-card" onclick="showToast('Iniciando llamada de emergencia al 911...')">
+                                <span class="material-symbols-rounded text-cyan" style="font-size:28px;">call</span>
+                                <span>Llamar al 911</span>
+                            </button>
+                            <button type="button" class="action-card" onclick="showToast('Ubicación en tiempo real compartida')">
+                                <span class="material-symbols-rounded text-cyan" style="font-size:28px;">location_on</span>
+                                <span>Compartir ubicación</span>
+                            </button>
+                        </div>
+
+                        <div class="md3-card mt-16" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="switchView('cameras')">
+                            <div style="display:flex; align-items:center; gap:14px;">
+                                <span class="material-symbols-rounded text-cyan" style="font-size:28px;">videocam</span>
+                                <div>
+                                    <div style="font-weight:700;">Ver cámaras de seguridad</div>
+                                    <div class="text-secondary text-xs">3 dispositivos conectados en línea</div>
+                                </div>
+                            </div>
+                            <span class="material-symbols-rounded text-cyan">chevron_right</span>
+                        </div>
+
+                        <div class="md3-card mt-16">
+                            <h3 class="section-title" style="margin-bottom:8px;">CONTACTOS DE EMERGENCIA</h3>
+                            <div class="contact-row">
+                                <div>
+                                    <div style="font-weight:700;">Monica Amaya</div>
+                                    <div class="text-secondary text-xs">Hermana • Contacto principal</div>
+                                </div>
+                                <button type="button" class="icon-btn" onclick="showToast('Llamando a Monica Amaya...')">
+                                    <span class="material-symbols-rounded">call</span>
+                                </button>
+                            </div>
+                            <div class="contact-row">
+                                <div>
+                                    <div style="font-weight:700;">Carlos Pérez</div>
+                                    <div class="text-secondary text-xs">Amigo • Contacto de apoyo</div>
+                                </div>
+                                <button type="button" class="icon-btn" onclick="showToast('Llamando a Carlos Pérez...')">
+                                    <span class="material-symbols-rounded">call</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA: MIS CÁMARAS -->
+            <section id="view-cameras" class="view-section">
+                <div class="cameras-header">
+                    <div class="md3-chip-group">
+                        <button type="button" class="md3-chip active" onclick="filterCameras('all', this)">Todas (3)</button>
+                        <button type="button" class="md3-chip" onclick="filterCameras('online', this)">En línea (2)</button>
+                        <button type="button" class="md3-chip" onclick="filterCameras('recording', this)">Grabando (1)</button>
+                    </div>
+                    <button type="button" class="md3-btn-primary" style="width:auto;" onclick="showToast('Buscando nuevas cámaras en la red Wi-Fi...')">
+                        <span class="material-symbols-rounded">add</span>
+                        AÑADIR CÁMARA
+                    </button>
+                </div>
+
+                <div class="cameras-grid">
+                    <div class="md3-card camera-item online">
+                        <div class="camera-feed">
+                            <span class="status-badge">EN LÍNEA • CAM 01</span>
+                            <span class="material-symbols-rounded" style="font-size:56px; color:var(--border-input);">videocam</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700;">Entrada principal</div>
+                                <div class="text-secondary text-xs">Resolución 1080p • 30fps</div>
+                            </div>
+                            <button type="button" class="icon-btn" onclick="showToast('Maximizando Entrada Principal')">
+                                <span class="material-symbols-rounded">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="md3-card camera-item online">
+                        <div class="camera-feed">
+                            <span class="status-badge">EN LÍNEA • CAM 02</span>
+                            <span class="material-symbols-rounded" style="font-size:56px; color:var(--border-input);">yard</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700;">Patio trasero</div>
+                                <div class="text-secondary text-xs">Visión nocturna infrarroja activa</div>
+                            </div>
+                            <button type="button" class="icon-btn" onclick="showToast('Maximizando Patio Trasero')">
+                                <span class="material-symbols-rounded">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="md3-card camera-item recording">
+                        <div class="camera-feed">
+                            <span class="status-badge rec">REC • CAM 03</span>
+                            <span class="material-symbols-rounded" style="font-size:56px; color:var(--border-input);">garage</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="font-weight:700;">Garaje vehicular</div>
+                                <div class="text-secondary text-xs">Detección de movimiento activada</div>
+                            </div>
+                            <button type="button" class="icon-btn" onclick="showToast('Maximizando Garaje')">
+                                <span class="material-symbols-rounded">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA: MI PERFIL -->
+            <section id="view-profile" class="view-section">
+                <div class="profile-grid">
+                    <div class="md3-card">
+                        <h3 class="section-title">DATOS PERSONALES</h3>
+                        <div class="profile-item">
+                            <span class="material-symbols-rounded text-cyan">account_circle</span>
+                            <div>
+                                <div id="profile-name-display" style="font-weight:700;">Usuario</div>
+                                <div class="text-secondary text-xs">Titular de la cuenta SOS</div>
+                            </div>
+                        </div>
+                        <div class="profile-item">
+                            <span class="material-symbols-rounded text-cyan">smartphone</span>
+                            <div>
+                                <div id="profile-phone-display" style="font-weight:700;">Sin registrar</div>
+                                <div class="text-secondary text-xs">Teléfono móvil registrado</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md3-card">
+                        <h3 class="section-title">SEGURIDAD Y EMERGENCIAS</h3>
+                        <div class="profile-item">
+                            <span class="material-symbols-rounded text-cyan">verified_user</span>
+                            <div>
+                                <div style="font-weight:700;">Protección Satelital GPS</div>
+                                <div class="text-cyan text-xs">Activa (Precisión: 3 metros)</div>
+                            </div>
+                        </div>
+                        <div class="profile-item">
+                            <span class="material-symbols-rounded text-cyan">notifications_active</span>
+                            <div>
+                                <div style="font-weight:700;">Contactos de Emergencia</div>
+                                <div class="text-secondary text-xs">2 contactos configurados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- OVERLAY ALERTA SOS -->
+    <div id="alert-overlay" class="alert-overlay">
+        <span class="material-symbols-rounded" style="font-size:80px;">notifications_active</span>
+        <h2 style="font-size:32px;">¡ALERTA SOS TRANSMITIDA!</h2>
+        <p class="text-sm" style="max-width:460px;">Coordenadas GPS enviadas a la patrulla policial y a tus contactos de emergencia.</p>
+        <button type="button" class="md3-btn-primary" style="width:auto; background:#FFFFFF; color:#E11D48; padding:16px 32px;" onclick="cancelSOSAlert()">
+            <span class="material-symbols-rounded">close</span>
+            DESACTIVAR ALERTA SOS
+        </button>
+    </div>
+
+    <!-- TOAST -->
+    <div id="md3-toast" class="md3-toast">
+        <span class="material-symbols-rounded text-cyan" style="font-size:20px;">check_circle</span>
+        <span id="toast-text">Notificación</span>
+    </div>
+
+    <script>
+        let sosInterval = null;
+        let sosElapsed = 0;
+        const circumference = 2 * Math.PI * 100;
+
+        function switchAuthTab(type) {
+            document.getElementById('tab-login').classList.toggle('active', type === 'login');
+            document.getElementById('tab-register').classList.toggle('active', type === 'register');
+            document.getElementById('form-login').classList.toggle('active', type === 'login');
+            document.getElementById('form-register').classList.toggle('active', type === 'register');
+        }
+
+        function handleAuthSubmit(event, type) {
+            event.preventDefault();
+            const phone = document.getElementById(type === 'register' ? 'reg-phone' : 'login-phone').value.trim();
+            const name = type === 'register'
+                ? (document.getElementById('reg-name').value.trim() || 'Usuario')
+                : (document.getElementById('profile-name-display').textContent || 'Usuario');
+
+            document.getElementById('topbar-greeting').textContent = `Hola, ${name}`;
+            document.getElementById('profile-name-display').textContent = name;
+            document.getElementById('profile-phone-display').textContent = phone;
+
+            document.getElementById('auth-view').style.display = 'none';
+            document.getElementById('dashboard-view').classList.add('active');
+            switchView('home');
+            showToast(type === 'register' ? `¡Bienvenido a Seguridad SOS, ${name}!` : 'Sesión iniciada correctamente');
+        }
+
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${viewName}`).classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.getElementById(`nav-${viewName}`).classList.add('active');
+        }
+
+        function filterCameras(filter, btn) {
+            document.querySelectorAll('.md3-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.camera-item').forEach(cam => {
+                cam.style.display = (filter === 'all' || cam.classList.contains(filter)) ? 'block' : 'none';
+            });
+        }
+
+        function logout() {
+            document.getElementById('reg-pin').value = '';
+            document.getElementById('login-pin').value = '';
+            document.getElementById('dashboard-view').classList.remove('active');
+            document.getElementById('auth-view').style.display = 'flex';
+            showToast('Has cerrado sesión');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('md3-toast');
+            document.getElementById('toast-text').textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // Botón SOS de 3 segundos
+        const btnSos = document.getElementById('btnSos');
+        const circle = document.getElementById('progress-circle');
+        const statusLabel = document.getElementById('sos-status-label');
+
+        function startSosHold(e) {
+            e.preventDefault();
+            cancelSosHold();
+            sosElapsed = 0;
+            sosInterval = setInterval(() => {
+                sosElapsed += 50;
+                const progress = Math.min(sosElapsed / 3000, 1);
+                circle.style.strokeDashoffset = circumference * (1 - progress);
+                const rem = Math.max(1, Math.ceil((3000 - sosElapsed) / 1000));
+                statusLabel.textContent = `Enviando alerta en ${rem}s...`;
+                if (sosElapsed >= 3000) {
+                    cancelSosHold();
+                    document.getElementById('alert-overlay').classList.add('active');
+                }
+            }, 50);
+        }
+
+        function cancelSosHold() {
+            clearInterval(sosInterval);
+            sosInterval = null;
+            circle.style.strokeDashoffset = circumference;
+            statusLabel.textContent = 'Mantén pulsado 3 segundos';
+        }
+
+        function cancelSOSAlert() {
+            document.getElementById('alert-overlay').classList.remove('active');
+            showToast('Alerta SOS desactivada');
+        }
+
+        btnSos.addEventListener('mousedown', startSosHold);
+        btnSos.addEventListener('touchstart', startSosHold);
+        btnSos.addEventListener('mouseup', cancelSosHold);
+        btnSos.addEventListener('mouseleave', cancelSosHold);
+        btnSos.addEventListener('touchend', cancelSosHold);
+    </script>
+</body>
+</html>
