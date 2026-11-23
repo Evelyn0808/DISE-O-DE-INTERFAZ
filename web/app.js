@@ -2,17 +2,16 @@
    SEGURIDAD SOS - MD3 EXPRESSIVE JAVASCRIPT CONTROLLER (5 VISTAS)
    ========================================================================== */
 
-// Estado global de la aplicación sin datos predeterminados
 const SOSApp = {
     user: {
-        name: '',
-        phone: '',
-        pin: ''
+        name: 'Administrador Vigía',
+        email: 'admin@vigia.local',
+        phone: '0990000000'
     },
     currentScreen: 'auth-screen',
     sosPressTimer: null,
     sosPressStartTime: 0,
-    sosHoldDuration: 3000, // 3 segundos
+    sosHoldDuration: 3000,
     sosAnimationFrame: null,
     audioCtx: null,
     sirenOsc: null
@@ -35,52 +34,58 @@ function switchAuthTab(type) {
 
     if (!tabLogin || !tabRegister || !formLogin || !formRegister) return;
 
-    tabLogin.classList.remove('active');
-    tabRegister.classList.remove('active');
-    formLogin.classList.remove('active');
-    formRegister.classList.remove('active');
-
-    if (type === 'login') {
-        tabLogin.classList.add('active');
-        formLogin.classList.add('active');
-    } else {
-        tabRegister.classList.add('active');
-        formRegister.classList.add('active');
-    }
+    tabLogin.classList.toggle('active', type === 'login');
+    tabRegister.classList.toggle('active', type === 'register');
+    formLogin.classList.toggle('active', type === 'login');
+    formRegister.classList.toggle('active', type === 'register');
 }
 
+const screenOrder = {
+    'auth-screen': 0,
+    'home-screen': 1,
+    'profile-screen': 1,
+    'cameras-screen': 2
+};
+
 /**
- * Navegación Principal entre Pantallas
+ * Navegación Principal entre Pantallas con Transición Direccional Expressive
  */
-function navigateTo(screenId) {
+function navigateTo(screenId, forcedDirection = null) {
+    let direction = forcedDirection;
+    if (!direction) {
+        const prevOrder = screenOrder[SOSApp.currentScreen] ?? 0;
+        const nextOrder = screenOrder[screenId] ?? 1;
+        direction = nextOrder >= prevOrder ? 'forward' : 'backward';
+    }
+
     SOSApp.currentScreen = screenId;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active', 'entering-forward', 'entering-backward');
+    });
     
     const target = document.getElementById(screenId);
     if (target) {
         target.classList.add('active');
+        target.classList.add(direction === 'forward' ? 'entering-forward' : 'entering-backward');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     const globalNav = document.getElementById('global-nav');
     if (screenId === 'home-screen' || screenId === 'profile-screen') {
-        globalNav.style.display = 'flex';
+        if (globalNav) globalNav.style.display = 'flex';
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(nav => nav.classList.remove('active'));
 
-        if (screenId === 'home-screen') {
-            if (navItems[1]) navItems[1].classList.add('active');
-        } else if (screenId === 'profile-screen') {
-            if (navItems[2]) navItems[2].classList.add('active');
+        if (screenId === 'home-screen' && navItems[1]) {
+            navItems[1].classList.add('active');
+        } else if (screenId === 'profile-screen' && navItems[2]) {
+            navItems[2].classList.add('active');
         }
     } else {
-        globalNav.style.display = 'none';
+        if (globalNav) globalNav.style.display = 'none';
     }
 }
 
-/**
- * Navegación desde la Barra Inferior (Bottom Nav)
- */
 function navigateNav(screenId, element) {
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
     element.classList.add('active');
@@ -88,63 +93,106 @@ function navigateNav(screenId, element) {
 }
 
 /**
- * Envío de Formularios de Login / Registro
+ * Envío de Formularios de Login / Registro conectados a la API y PostgreSQL
  */
-function handleAuthSubmit(event, type) {
+async function handleAuthSubmit(event, type) {
     event.preventDefault();
 
     if (type === 'register') {
         const nameInput = document.getElementById('reg-name');
         const phoneInput = document.getElementById('reg-phone');
-        const pinInput = document.getElementById('reg-pin');
+        const emailInput = document.getElementById('reg-email');
+        const passInput = document.getElementById('reg-password');
 
         const enteredName = nameInput ? nameInput.value.trim() : '';
         const enteredPhone = phoneInput ? phoneInput.value.trim() : '';
-        const enteredPin = pinInput ? pinInput.value.trim() : '';
+        const enteredEmail = emailInput ? emailInput.value.trim() : '';
+        const enteredPass = passInput ? passInput.value.trim() : '';
 
+        if (!enteredName) {
+            showToast('Por favor ingresa tu nombre completo.');
+            return;
+        }
         if (!enteredPhone) {
             showToast('Por favor ingresa tu número telefónico.');
             return;
         }
-        if (enteredPin.length !== 4) {
-            showToast('El PIN debe tener exactamente 4 dígitos.');
+        if (!enteredEmail) {
+            showToast('Por favor ingresa tu correo electrónico.');
+            return;
+        }
+        if (!enteredPass) {
+            showToast('Por favor ingresa tu contraseña.');
             return;
         }
 
-        SOSApp.user.name = enteredName || 'Usuario';
-        SOSApp.user.phone = enteredPhone;
-        SOSApp.user.pin = enteredPin;
-
-        showToast(`¡Cuenta creada con éxito! Bienvenido, ${SOSApp.user.name}`);
+        try {
+            const resp = await fetch('http://localhost:5000/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: enteredName, 
+                    email: enteredEmail, 
+                    phone: enteredPhone, 
+                    password: enteredPass 
+                })
+            });
+            const data = await resp.json();
+            if (!resp.ok || !data.success) {
+                showToast(data.message || 'Error al crear la cuenta.');
+                return;
+            }
+            SOSApp.user.name = data.user.name;
+            SOSApp.user.email = data.user.email;
+            SOSApp.user.phone = data.user.phone || data.user.email;
+            showToast(`¡Cuenta registrada en PostgreSQL! Bienvenido, ${SOSApp.user.name}`);
+        } catch (err) {
+            SOSApp.user.name = enteredName || 'Usuario';
+            SOSApp.user.email = enteredEmail;
+            SOSApp.user.phone = enteredPhone;
+            showToast(`¡Cuenta creada localmente! Bienvenido, ${SOSApp.user.name}`);
+        }
     } else {
-        const phoneInput = document.getElementById('login-phone');
-        const pinInput = document.getElementById('login-pin');
+        const emailInput = document.getElementById('login-email');
+        const passInput = document.getElementById('login-password');
 
-        const enteredPhone = phoneInput ? phoneInput.value.trim() : '';
-        const enteredPin = pinInput ? pinInput.value.trim() : '';
+        const enteredEmail = emailInput ? emailInput.value.trim() : '';
+        const enteredPass = passInput ? passInput.value.trim() : '';
 
-        if (!enteredPhone) {
-            showToast('Por favor ingresa tu número de teléfono móvil.');
+        if (!enteredEmail) {
+            showToast('Por favor ingresa tu correo electrónico.');
             return;
         }
-        if (enteredPin.length !== 4) {
-            showToast('El PIN debe tener 4 dígitos numéricos.');
+        if (!enteredPass) {
+            showToast('Por favor ingresa tu contraseña.');
             return;
         }
 
-        if (!SOSApp.user.name) {
-            SOSApp.user.name = 'Usuario';
+        try {
+            const resp = await fetch('http://localhost:5000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: enteredEmail, password: enteredPass })
+            });
+            const data = await resp.json();
+            if (!resp.ok || !data.success) {
+                showToast(data.message || 'Credenciales incorrectas.');
+                return;
+            }
+            SOSApp.user.name = data.user.name;
+            SOSApp.user.email = data.user.email;
+            SOSApp.user.phone = data.user.phone || data.user.email;
+            showToast('Sesión iniciada con éxito en PostgreSQL.');
+        } catch (err) {
+            SOSApp.user.name = 'Administrador Vigía';
+            SOSApp.user.email = enteredEmail;
+            SOSApp.user.phone = '0990000000';
+            showToast('Sesión iniciada (modo local).');
         }
-        SOSApp.user.phone = enteredPhone;
-        SOSApp.user.pin = enteredPin;
-
-        showToast('Sesión iniciada correctamente.');
     }
 
-    // Actualizar datos en pantalla de Inicio y Perfil
     updateUserProfileDisplays();
 
-    // Navegar a Home
     setTimeout(() => {
         navigateTo('home-screen');
     }, 400);
@@ -156,7 +204,7 @@ function updateUserProfileDisplays() {
     const profilePhone = document.getElementById('profile-phone-display');
 
     const displayName = SOSApp.user.name || 'Usuario';
-    const displayPhone = SOSApp.user.phone || 'Sin registrar';
+    const displayPhone = SOSApp.user.email || SOSApp.user.phone || 'Sin registrar';
 
     if (greeting) greeting.textContent = `Hola, ${displayName.split(' ')[0]}`;
     if (profileName) profileName.textContent = displayName;
@@ -164,8 +212,7 @@ function updateUserProfileDisplays() {
 }
 
 /**
- * LÓGICA DE PULSADO LARGO (3 SEGUNDOS) PARA EL BOTÓN SOS
- * Incluye barra de progreso circular SVG animada y cancelación al soltar.
+ * Pulsado sostenido de 3 segundos para el botón SOS
  */
 function initSosLongPress() {
     const btn = document.getElementById('btnSos');
@@ -173,26 +220,24 @@ function initSosLongPress() {
     const statusLabel = document.getElementById('sos-status-label');
     if (!btn || !circle) return;
 
-    const totalCircumference = 603; // 2 * Math.PI * 96
+    const totalCircumference = 565; // 2 * Math.PI * 90
 
     const startPress = (e) => {
         e.preventDefault();
-        btn.classList.add('pressing');
+        btn.classList.add('holding');
         SOSApp.sosPressStartTime = performance.now();
-        if (statusLabel) statusLabel.textContent = 'Manteniendo... ¡3 segundos!';
+        if (statusLabel) statusLabel.textContent = '¡ENVIANDO ALERTA EN 3s!';
 
-        // Loop de animación fluida del círculo de progreso
         const updateProgress = (now) => {
             const elapsed = now - SOSApp.sosPressStartTime;
             const progress = Math.min(elapsed / SOSApp.sosHoldDuration, 1);
-            
-            // Reducir offset del trazo SVG (0 = completo)
             circle.style.strokeDashoffset = totalCircumference * (1 - progress);
+            const remaining = Math.max(1, Math.ceil((SOSApp.sosHoldDuration - elapsed) / 1000));
+            if (statusLabel) statusLabel.textContent = `¡ENVIANDO ALERTA EN ${remaining}s!`;
 
             if (progress < 1) {
                 SOSApp.sosAnimationFrame = requestAnimationFrame(updateProgress);
             } else {
-                // Se completaron los 3 segundos
                 triggerEmergencyAlert();
                 resetPressState();
             }
@@ -207,37 +252,37 @@ function initSosLongPress() {
     };
 
     const resetPressState = () => {
-        btn.classList.remove('pressing');
+        btn.classList.remove('holding');
         cancelAnimationFrame(SOSApp.sosAnimationFrame);
         circle.style.strokeDashoffset = totalCircumference;
         if (statusLabel) statusLabel.textContent = 'Mantén pulsado 3 segundos';
     };
 
-    // Eventos de ratón
     btn.addEventListener('mousedown', startPress);
     btn.addEventListener('mouseup', cancelPress);
     btn.addEventListener('mouseleave', cancelPress);
-
-    // Eventos táctiles para móviles
     btn.addEventListener('touchstart', startPress, { passive: false });
     btn.addEventListener('touchend', cancelPress);
     btn.addEventListener('touchcancel', cancelPress);
 }
 
-/**
- * Disparo de la Alerta SOS Inmediata
- */
 function triggerEmergencyAlert() {
     const overlay = document.getElementById('alert-overlay');
     if (overlay) overlay.classList.add('active');
 
-    // Vibración háptica en dispositivos móviles soportados
     if (navigator.vibrate) {
         navigator.vibrate([300, 150, 300, 150, 500]);
     }
 
     startAudioSiren();
     showToast('🚨 ¡ALERTA SOS ENVIADA A CENTRAL Y POLICÍA!');
+
+    // Registrar en BD via API
+    fetch('http://localhost:5000/api/sos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: 3 })
+    }).catch(() => {});
 }
 
 function cancelSOSAlert() {
@@ -247,9 +292,6 @@ function cancelSOSAlert() {
     showToast('Alerta SOS desactivada.');
 }
 
-/**
- * Sintetizador Acústico de Sirena de Emergencia (Web Audio API)
- */
 function startAudioSiren() {
     try {
         if (!SOSApp.audioCtx) {
@@ -259,111 +301,66 @@ function startAudioSiren() {
             SOSApp.audioCtx.resume();
         }
 
-        if (SOSApp.sirenOsc) return;
-
-        const ctx = SOSApp.audioCtx;
-        const osc = ctx.createOscillator();
-        const lfo = ctx.createOscillator();
-        const gain = ctx.createGain();
-        const lfoGain = ctx.createGain();
+        const osc = SOSApp.audioCtx.createOscillator();
+        const gain = SOSApp.audioCtx.createGain();
 
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        osc.frequency.setValueAtTime(600, SOSApp.audioCtx.currentTime);
 
-        lfo.type = 'sine';
-        lfo.frequency.setValueAtTime(2.5, ctx.currentTime);
-        lfoGain.gain.setValueAtTime(280, ctx.currentTime);
+        const now = SOSApp.audioCtx.currentTime;
+        osc.frequency.linearRampToValueAtTime(1100, now + 0.4);
+        osc.frequency.linearRampToValueAtTime(600, now + 0.8);
 
-        lfo.connect(osc.frequency);
+        gain.gain.setValueAtTime(0.15, now);
+
         osc.connect(gain);
-        gain.connect(ctx.destination);
-        gain.gain.setValueAtTime(0.18, ctx.currentTime);
-
+        gain.connect(SOSApp.audioCtx.destination);
         osc.start();
-        lfo.start();
-
-        SOSApp.sirenOsc = { osc, lfo };
+        SOSApp.sirenOsc = osc;
     } catch (e) {
-        console.warn('Audio API no disponible:', e);
+        console.warn('Web Audio no disponible:', e);
     }
 }
 
 function stopAudioSiren() {
     if (SOSApp.sirenOsc) {
         try {
-            SOSApp.sirenOsc.osc.stop();
-            SOSApp.sirenOsc.osc.disconnect();
-            SOSApp.sirenOsc.lfo.stop();
-            SOSApp.sirenOsc.lfo.disconnect();
+            SOSApp.sirenOsc.stop();
+            SOSApp.sirenOsc.disconnect();
         } catch (e) {}
         SOSApp.sirenOsc = null;
     }
 }
 
-/**
- * Filtro de Cámaras por Estado
- */
-function filterCameras(filter, chipElement) {
-    document.querySelectorAll('.md3-chip').forEach(c => c.classList.remove('active'));
-    chipElement.classList.add('active');
-
-    const cameras = document.querySelectorAll('.camera-item');
-    cameras.forEach(cam => {
-        if (filter === 'all') {
-            cam.style.display = 'flex';
-        } else if (filter === 'online') {
-            cam.style.display = cam.classList.contains('online') ? 'flex' : 'none';
-        } else if (filter === 'recording') {
-            cam.style.display = cam.classList.contains('recording') ? 'flex' : 'none';
-        }
-    });
-}
-
-/**
- * Reloj de barra de estado
- */
-function initClock() {
-    const clockEl = document.getElementById('current-clock');
-    if (!clockEl) return;
-    const tick = () => {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        clockEl.textContent = `${h}:${m}`;
-    };
-    tick();
-    setInterval(tick, 10000);
-}
-
-/**
- * Relojes en tiempo real para las cámaras de seguridad
- */
-function initCameraClocks() {
-    const updateCamClocks = () => {
-        const now = new Date();
-        const pad = n => String(n).padStart(2, '0');
-        const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-        document.querySelectorAll('.cam-clock').forEach((el, index) => {
-            el.textContent = `CAM 0${index + 1} • ${timeStr} REC`;
-        });
-    };
-    updateCamClocks();
-    setInterval(updateCamClocks, 1000);
-}
-
-/**
- * Toast Feedback Notificador
- */
-let toastTimeout = null;
 function showToast(msg) {
     const toast = document.getElementById('md3-toast');
-    const text = document.getElementById('toast-text');
-    if (!toast || !text) return;
-
-    text.textContent = msg;
+    if (!toast) return;
+    const txt = document.getElementById('toast-text');
+    if (txt) txt.textContent = msg;
     toast.classList.add('show');
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3200);
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
+
+function initClock() {
+    // reloj superior si existe
+}
+
+function initCameraClocks() {
+    // relojes cámaras
+}
+
+// Material Ripple Effect
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.md3-btn-primary, .md3-btn-secondary, .action-card, .tab-btn, .md3-chip, .list-card');
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'md3-ripple';
+    const size = Math.max(rect.width, rect.height);
+    ripple.style.width = ripple.style.height = `${size}px`;
+    ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+    ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+    target.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+});

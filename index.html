@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,21 +8,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0"
+        rel="stylesheet">
     <style>
         :root {
-            /* Paleta de colores sólidos (Figma) */
-            --bg-main: #111A4D;          /* Fondo principal */
-            --bg-input-nav: #1A275E;     /* Campos y navegación inferior */
-            --bg-card: #243575;          /* Tarjetas y botones secundarios */
-            --border-input: #5266AD;     /* Bordes de campos */
-            --text-primary: #FFFFFF;     /* Títulos y texto principal */
-            --text-secondary: #CDD9FF;   /* Texto secundario y descripciones */
-            --accent-cyan: #79F2ED;      /* Enlaces y detalles destacados */
-            --btn-primary: #D9165D;      /* Botones principales e indicadores activos */
-            --zone-alert: #4C1D95;       /* Zonas de alerta y estados activos */
-            --sos-red: #E11D48;          /* Botón circular SOS */
-            --action-blue: #1665C1;      /* Acciones de llamar y compartir ubicación */
+            /* Paleta Material Design 3 Expressive (Colores Vívidos y Elegantes) */
+            --bg-main: #0A0E24;
+            /* Midnight Obsidian */
+            --bg-input-nav: #141A38;
+            /* Superficie profunda */
+            --bg-card: #1E2750;
+            /* Tarjetas elevadas */
+            --border-input: #384878;
+            /* Bordes refinados */
+            --text-primary: #FFFFFF;
+            /* Títulos y texto principal */
+            --text-secondary: #A0B0D8;
+            /* Texto secundario y descripciones */
+            --accent-cyan: #00F2FE;
+            /* Cyan eléctrico vibrante */
+            --btn-primary: #FF2D55;
+            /* Rosa carmesí SOS Expressive */
+            --btn-primary-hover: #E11D48;
+            --zone-alert: #431D78;
+            /* Púrpura real para zonas de alerta */
+            --sos-red: #FF2D55;
+            /* Botón circular SOS */
+            --action-blue: #2563EB;
+            /* Acciones de llamar y compartir ubicación */
+            --glow-sos: 0 0 28px rgba(255, 45, 85, 0.45);
 
             --radius-xl: 24px;
             --radius-lg: 16px;
@@ -53,35 +68,388 @@
         }
 
         /* Utilidades */
-        .content-padding { padding: 0 20px 28px; }
-        .mt-12 { margin-top: 12px; }
-        .mt-16 { margin-top: 16px; }
-        .mt-24 { margin-top: 24px; }
-        .text-cyan { color: var(--accent-cyan); }
-        .text-secondary { color: var(--text-secondary); }
-        .text-sm { font-size: 13px; }
-        .text-xs { font-size: 11px; }
+        .content-padding {
+            padding: 0 20px 28px;
+        }
 
-        /* Pantallas */
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.25s ease; }
-        .screen.with-nav { padding-bottom: 86px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .mt-12 {
+            margin-top: 12px;
+        }
+
+        .mt-16 {
+            margin-top: 16px;
+        }
+
+        .mt-24 {
+            margin-top: 24px;
+        }
+
+        .text-cyan {
+            color: var(--accent-cyan);
+        }
+
+        .text-secondary {
+            color: var(--text-secondary);
+        }
+
+        .text-sm {
+            font-size: 13px;
+        }
+
+        .text-xs {
+            font-size: 11px;
+        }
+
+        /* ==========================================================================
+           MICRO-INTERACCIONES: TRANSICIONES DE PANTALLA EXPRESIVAS (MD3 EXPRESSIVE)
+           ========================================================================== */
+        .screen {
+            display: none;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .screen.entering-forward {
+            animation: screenSlideForward 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .screen.entering-backward {
+            animation: screenSlideBackward 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .screen.with-nav {
+            padding-bottom: 86px;
+        }
+
+        @keyframes screenSlideForward {
+            0% {
+                opacity: 0;
+                transform: translateX(45px) scale(0.96);
+                filter: blur(4px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes screenSlideBackward {
+            0% {
+                opacity: 0;
+                transform: translateX(-45px) scale(0.96);
+                filter: blur(4px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        /* Cascada de elementos escalonados al entrar a pantalla */
+        .screen.active .stagger-1 {
+            animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.04s;
+        }
+
+        .screen.active .stagger-2 {
+            animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.10s;
+        }
+
+        .screen.active .stagger-3 {
+            animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.16s;
+        }
+
+        .screen.active .stagger-4 {
+            animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.22s;
+        }
+
+        .screen.active .stagger-5 {
+            animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.28s;
+        }
+
+        @keyframes staggerSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ==========================================================================
+           LOS 3 ESTADOS: REPOSO • INTERACCIÓN • ACCIÓN
+           ========================================================================== */
+
+        /* 1. ESTADO DE REPOSO (REST / IDLE) */
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-cyan);
+            display: inline-block;
+            margin-right: 6px;
+            animation: liveDotBeacon 2s infinite ease-in-out;
+            vertical-align: middle;
+        }
+
+        @keyframes liveDotBeacon {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 8px #00F2FE;
+            }
+
+            50% {
+                opacity: 0.35;
+                transform: scale(0.75);
+                box-shadow: 0 0 2px #00F2FE;
+            }
+        }
+
+        @keyframes sosReposoBreathing {
+
+            0%,
+            100% {
+                box-shadow: 0 0 22px rgba(255, 45, 85, 0.35), 0 8px 24px rgba(0, 0, 0, 0.45);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 42px rgba(255, 45, 85, 0.65), 0 10px 30px rgba(0, 0, 0, 0.55);
+                transform: scale(1.02);
+            }
+        }
+
+        /* 2. ESTADO DE INTERACCIÓN (HOVER / FOCUS / TOUCH PRE-ACTIVATION) */
+        /* Transición suave para todos los controles interactivos */
+        .md3-btn-primary,
+        .md3-btn-secondary,
+        .action-card,
+        .md3-card,
+        .tab-btn,
+        .nav-item,
+        .md3-chip,
+        .icon-btn {
+            transition: all 0.24s cubic-bezier(0.2, 0.9, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            /* Para el efecto onda ripple */
+        }
+
+        .md3-btn-primary:hover {
+            background-color: var(--btn-primary-hover);
+            transform: translateY(-2px) scale(1.015);
+            box-shadow: 0 8px 25px rgba(255, 45, 85, 0.55), 0 0 14px rgba(0, 242, 254, 0.35);
+        }
+
+        .md3-btn-secondary:hover {
+            background-color: rgba(0, 242, 254, 0.12);
+            border: 1px solid var(--accent-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25);
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 26px rgba(37, 99, 235, 0.45);
+            outline: 1.5px solid var(--accent-cyan);
+        }
+
+        .md3-card:hover {
+            transform: translateY(-3px);
+            border: 1px solid rgba(0, 242, 254, 0.5);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 16px rgba(0, 242, 254, 0.12);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: #28346A;
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .md3-chip:hover:not(.active) {
+            background-color: #28346A;
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .nav-item:hover {
+            color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* 3. ESTADO DE ACCIÓN (ACTIVE / PRESSED / TRIGGER / FEEDBACK) */
+        .md3-btn-primary:active,
+        .md3-btn-secondary:active,
+        .action-card:active,
+        .tab-btn:active,
+        .md3-chip:active,
+        .list-card:active {
+            transform: scale(0.95) translateY(1px) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6) !important;
+            transition: transform 0.08s ease, box-shadow 0.08s ease;
+        }
+
+        /* Efecto Ripple (Onda Material) */
+        .md3-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0);
+            animation: rippleEffect 0.55s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(3.5);
+                opacity: 0;
+            }
+        }
+
+        /* Botón SOS en Acción (Mantenido 3s) */
+        .sos-btn.holding {
+            animation: sosAccionHeartbeat 0.35s infinite ease-in-out !important;
+            box-shadow: 0 0 65px rgba(255, 45, 85, 0.95), 0 0 110px rgba(0, 242, 254, 0.6) !important;
+            border-color: var(--accent-cyan) !important;
+        }
+
+        @keyframes sosAccionHeartbeat {
+
+            0%,
+            100% {
+                transform: scale(0.96);
+            }
+
+            50% {
+                transform: scale(1.035);
+            }
+        }
+
+        /* Error Shake Feedback */
+        @keyframes shakeErrorAction {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-8px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(8px);
+            }
+        }
+
+        .shake-error {
+            animation: shakeErrorAction 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            border-color: var(--sos-red) !important;
+        }
+
+        /* Toast con Rebote Elástico en Acción */
+        @keyframes toastActionBounce {
+            0% {
+                transform: translate(-50%, 50px) scale(0.85);
+                opacity: 0;
+            }
+
+            60% {
+                transform: translate(-50%, -8px) scale(1.03);
+                opacity: 1;
+            }
+
+            85% {
+                transform: translate(-50%, 2px) scale(0.99);
+            }
+
+            100% {
+                transform: translate(-50%, 0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .md3-toast.show {
+            display: flex;
+            animation: toastActionBounce 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Ondas de Radar en Alerta Disparada */
+        .radar-wave {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            animation: radarWaveExpand 1.6s infinite ease-out;
+            pointer-events: none;
+        }
+
+        .radar-wave:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .radar-wave:nth-child(3) {
+            animation-delay: 1.0s;
+        }
+
+        @keyframes radarWaveExpand {
+            0% {
+                transform: scale(0.6);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: scale(2.4);
+                opacity: 0;
+            }
+        }
 
         /* Headers */
         .app-header {
             text-align: center;
             padding: 32px 20px 18px;
         }
+
         .logo-row {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
-        .logo-icon { font-size: 30px; color: var(--btn-primary); }
-        .app-header h1 { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
-        .subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+        .logo-icon {
+            font-size: 30px;
+            color: var(--btn-primary);
+        }
+
+        .app-header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
 
         .top-app-bar {
             display: flex;
@@ -90,6 +458,7 @@
             padding: 20px;
             background-color: var(--bg-main);
         }
+
         .icon-btn {
             background: none;
             border: none;
@@ -106,6 +475,7 @@
             gap: 10px;
             padding: 0 20px 18px;
         }
+
         .tab-btn {
             flex: 1;
             background-color: var(--bg-card);
@@ -121,14 +491,24 @@
             justify-content: center;
             gap: 6px;
         }
+
         .tab-btn.active {
             background-color: var(--btn-primary);
             color: var(--text-primary);
         }
 
-        .auth-form { display: none; }
-        .auth-form.active { display: block; }
-        .display-text { font-size: 24px; font-weight: 700; }
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .display-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
 
         /* Campos de texto */
         .md3-text-field {
@@ -141,13 +521,16 @@
             align-items: center;
             padding: 8px 14px;
         }
+
         .md3-text-field:focus-within {
             border-color: var(--accent-cyan);
         }
+
         .md3-text-field .icon {
             color: var(--accent-cyan);
             margin-right: 12px;
         }
+
         .md3-text-field input {
             background: transparent;
             border: none;
@@ -157,6 +540,7 @@
             font-size: 15px;
             outline: none;
         }
+
         .md3-text-field label {
             position: absolute;
             left: 50px;
@@ -166,8 +550,9 @@
             transition: 0.2s;
             pointer-events: none;
         }
-        .md3-text-field input:focus ~ label,
-        .md3-text-field input:not(:placeholder-shown) ~ label {
+
+        .md3-text-field input:focus~label,
+        .md3-text-field input:not(:placeholder-shown)~label {
             top: 5px;
             font-size: 11px;
             color: var(--accent-cyan);
@@ -189,6 +574,7 @@
             justify-content: center;
             gap: 8px;
         }
+
         .md3-btn-secondary {
             background-color: var(--bg-card);
             color: var(--accent-cyan);
@@ -213,6 +599,7 @@
             text-align: center;
             margin: 18px 0;
         }
+
         .sos-wrapper {
             position: relative;
             width: 196px;
@@ -222,6 +609,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .progress-ring {
             position: absolute;
             top: 0;
@@ -230,6 +618,7 @@
             height: 196px;
             transform: rotate(-90deg);
         }
+
         .progress-ring-circle {
             fill: transparent;
             stroke: var(--accent-cyan);
@@ -237,7 +626,9 @@
             stroke-dasharray: 565.48;
             stroke-dashoffset: 565.48;
             transition: stroke-dashoffset 0.05s linear;
+            filter: drop-shadow(0 0 6px var(--accent-cyan));
         }
+
         .sos-btn {
             width: 168px;
             height: 168px;
@@ -252,11 +643,37 @@
             cursor: pointer;
             z-index: 2;
             user-select: none;
+            animation: sosReposoBreathing 3.2s infinite ease-in-out;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.2, 1);
         }
-        .sos-btn:active { transform: scale(0.96); }
-        .sos-text { font-size: 42px; font-weight: 900; line-height: 1; }
-        .sos-subtext { font-size: 11px; font-weight: 700; margin-top: 4px; letter-spacing: 0.8px; }
-        .sos-instruction { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+        .sos-btn:hover {
+            transform: scale(1.035);
+            box-shadow: 0 0 50px rgba(255, 45, 85, 0.8), 0 0 90px rgba(255, 45, 85, 0.45);
+        }
+
+        .sos-btn:active {
+            transform: scale(0.95);
+        }
+
+        .sos-text {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .sos-subtext {
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 4px;
+            letter-spacing: 0.8px;
+        }
+
+        .sos-instruction {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
 
         /* Acciones Rápidas (Azul intenso #1665C1) */
         .section-title {
@@ -267,11 +684,13 @@
             margin-bottom: 10px;
             text-transform: uppercase;
         }
+
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
+
         .action-card {
             background-color: var(--action-blue);
             color: var(--text-primary);
@@ -293,12 +712,14 @@
             border-radius: var(--radius-lg);
             padding: 16px;
         }
+
         .list-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
         }
+
         .list-card-content {
             display: flex;
             align-items: center;
@@ -311,6 +732,7 @@
             gap: 8px;
             overflow-x: auto;
         }
+
         .md3-chip {
             background-color: var(--bg-card);
             color: var(--text-secondary);
@@ -322,14 +744,17 @@
             cursor: pointer;
             white-space: nowrap;
         }
+
         .md3-chip.active {
             background-color: var(--btn-primary);
             color: var(--text-primary);
         }
+
         .camera-card {
             padding: 12px;
             margin-bottom: 14px;
         }
+
         .camera-feed {
             height: 150px;
             background-color: var(--bg-input-nav);
@@ -340,6 +765,7 @@
             justify-content: center;
             margin-bottom: 12px;
         }
+
         .status-badge {
             position: absolute;
             top: 10px;
@@ -351,10 +777,12 @@
             font-size: 10px;
             font-weight: 700;
         }
+
         .status-badge.rec {
             background-color: var(--sos-red);
             color: var(--text-primary);
         }
+
         .camera-info {
             display: flex;
             justify-content: space-between;
@@ -367,6 +795,7 @@
             border-radius: var(--radius-xl);
             padding: 8px 0;
         }
+
         .md3-list-item {
             display: flex;
             align-items: center;
@@ -374,7 +803,10 @@
             padding: 14px 18px;
             border-bottom: 1px solid var(--bg-input-nav);
         }
-        .md3-list-item:last-child { border-bottom: none; }
+
+        .md3-list-item:last-child {
+            border-bottom: none;
+        }
 
         /* Navegación Inferior (#1A275E) */
         .bottom-nav {
@@ -391,6 +823,7 @@
             padding: 10px 0 18px;
             z-index: 100;
         }
+
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -401,6 +834,7 @@
             font-weight: 500;
             cursor: pointer;
         }
+
         .nav-item.active {
             color: var(--btn-primary);
             font-weight: 700;
@@ -423,7 +857,10 @@
             z-index: 200;
             gap: 16px;
         }
-        .alert-overlay.active { display: flex; }
+
+        .alert-overlay.active {
+            display: flex;
+        }
 
         /* Toast */
         .md3-toast {
@@ -444,9 +881,13 @@
             z-index: 300;
             max-width: 370px;
         }
-        .md3-toast.show { display: flex; }
+
+        .md3-toast.show {
+            display: flex;
+        }
     </style>
 </head>
+
 <body>
     <div class="mobile-app">
 
@@ -461,21 +902,45 @@
             </header>
 
             <div class="md3-tabs">
-                <button type="button" class="tab-btn" id="tab-login" onclick="switchAuthTab('login')">
+                <button type="button" class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">
                     <span class="material-symbols-rounded" style="font-size:18px;">login</span>
                     INICIAR SESIÓN
                 </button>
-                <button type="button" class="tab-btn active" id="tab-register" onclick="switchAuthTab('register')">
+                <button type="button" class="tab-btn" id="tab-register" onclick="switchAuthTab('register')">
                     <span class="material-symbols-rounded" style="font-size:18px;">person_add</span>
                     CREAR CUENTA
                 </button>
             </div>
 
             <div class="content-padding">
+                <!-- Iniciar Sesión (Activo por defecto) -->
+                <div id="form-login" class="auth-form active">
+                    <h2 class="display-text">Bienvenido</h2>
+                    <p class="text-secondary text-sm mt-12">Ingresa tu correo y contraseña para acceder.</p>
+                    <form class="mt-24" onsubmit="handleAuthSubmit(event, 'login')">
+                        <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">mail</span>
+                            <input type="email" id="login-email" placeholder=" " value="admin@vigia.local" required>
+                            <label>Correo Electrónico</label>
+                        </div>
+                        <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">lock</span>
+                            <input type="password" id="login-password" placeholder=" " required>
+                            <label>Contraseña</label>
+                        </div>
+                        <p class="text-cyan text-sm" style="text-align:right; cursor:pointer;"
+                            onclick="showToast('Recuperación de contraseña enviada')">¿Olvidaste tu contraseña?</p>
+                        <button type="submit" class="md3-btn-primary mt-16">
+                            <span class="material-symbols-rounded">login</span>
+                            INICIAR SESIÓN
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Crear Cuenta -->
-                <div id="form-register" class="auth-form active">
-                    <h2 class="display-text">Crea tu cuenta</h2>
-                    <p class="text-secondary text-sm mt-12">Un paso más cerca de sentirte seguro.</p>
+                <div id="form-register" class="auth-form">
+                    <h2 class="display-text">Crea tu cuenta SOS</h2>
+                    <p class="text-secondary text-sm mt-12">Un paso más cerca de sentirte seguro 24/7.</p>
                     <form class="mt-24" onsubmit="handleAuthSubmit(event, 'register')">
                         <div class="md3-text-field">
                             <span class="material-symbols-rounded icon">person</span>
@@ -488,36 +953,18 @@
                             <label>Teléfono Móvil</label>
                         </div>
                         <div class="md3-text-field">
+                            <span class="material-symbols-rounded icon">mail</span>
+                            <input type="email" id="reg-email" placeholder=" " required>
+                            <label>Correo Electrónico</label>
+                        </div>
+                        <div class="md3-text-field">
                             <span class="material-symbols-rounded icon">lock</span>
-                            <input type="password" id="reg-pin" placeholder=" " maxlength="4" pattern="[0-9]{4}" inputmode="numeric" required>
-                            <label>PIN (4 dígitos)</label>
+                            <input type="password" id="reg-password" placeholder=" " required>
+                            <label>Contraseña de seguridad</label>
                         </div>
                         <button type="submit" class="md3-btn-primary mt-16">
                             <span class="material-symbols-rounded">shield</span>
                             CREAR MI CUENTA SOS
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Iniciar Sesión -->
-                <div id="form-login" class="auth-form">
-                    <h2 class="display-text">Bienvenido</h2>
-                    <p class="text-secondary text-sm mt-12">Ingresa para estar cerca de quienes te cuidan.</p>
-                    <form class="mt-24" onsubmit="handleAuthSubmit(event, 'login')">
-                        <div class="md3-text-field">
-                            <span class="material-symbols-rounded icon">smartphone</span>
-                            <input type="tel" id="login-phone" placeholder=" " required>
-                            <label>Teléfono Móvil</label>
-                        </div>
-                        <div class="md3-text-field">
-                            <span class="material-symbols-rounded icon">lock</span>
-                            <input type="password" id="login-pin" placeholder=" " maxlength="4" pattern="[0-9]{4}" inputmode="numeric" required>
-                            <label>PIN (4 dígitos)</label>
-                        </div>
-                        <p class="text-cyan text-sm" style="text-align:right; cursor:pointer;" onclick="showToast('Recuperación de PIN enviada por SMS')">¿Olvidaste tu PIN?</p>
-                        <button type="submit" class="md3-btn-primary mt-16">
-                            <span class="material-symbols-rounded">lock_open</span>
-                            INICIAR SESIÓN
                         </button>
                     </form>
                 </div>
@@ -590,48 +1037,56 @@
 
             <div class="content-padding">
                 <div class="md3-chip-group">
-                    <button type="button" class="md3-chip active" onclick="filterCameras('all', this)">Todas (3)</button>
+                    <button type="button" class="md3-chip active" onclick="filterCameras('all', this)">Todas
+                        (3)</button>
                     <button type="button" class="md3-chip" onclick="filterCameras('online', this)">En línea (2)</button>
-                    <button type="button" class="md3-chip" onclick="filterCameras('recording', this)">Grabando (1)</button>
+                    <button type="button" class="md3-chip" onclick="filterCameras('recording', this)">Grabando
+                        (1)</button>
                 </div>
 
                 <div class="mt-16">
-                    <div class="md3-card camera-card camera-item online">
+                    <div class="md3-card camera-card camera-item online stagger-1">
                         <div class="camera-feed">
-                            <span class="status-badge">EN LÍNEA • CAM 01</span>
-                            <span class="material-symbols-rounded" style="font-size:48px; color:var(--border-input);">videocam</span>
+                            <span class="status-badge"><span class="live-dot"></span>EN LÍNEA • CAM 01</span>
+                            <span class="material-symbols-rounded"
+                                style="font-size:48px; color:var(--border-input);">videocam</span>
                         </div>
                         <div class="camera-info">
                             <div>
                                 <div style="font-weight:700;">Entrada principal</div>
                                 <div class="text-secondary text-xs">Resolución 1080p • 30fps</div>
                             </div>
-                            <button type="button" class="icon-btn text-cyan" onclick="showToast('Maximizando Entrada Principal')">
+                            <button type="button" class="icon-btn text-cyan"
+                                onclick="showToast('Maximizando Entrada Principal')">
                                 <span class="material-symbols-rounded">fullscreen</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="md3-card camera-card camera-item online">
+                    <div class="md3-card camera-card camera-item online stagger-2">
                         <div class="camera-feed">
-                            <span class="status-badge">EN LÍNEA • CAM 02</span>
-                            <span class="material-symbols-rounded" style="font-size:48px; color:var(--border-input);">yard</span>
+                            <span class="status-badge"><span class="live-dot"></span>EN LÍNEA • CAM 02</span>
+                            <span class="material-symbols-rounded"
+                                style="font-size:48px; color:var(--border-input);">yard</span>
                         </div>
                         <div class="camera-info">
                             <div>
                                 <div style="font-weight:700;">Patio trasero</div>
                                 <div class="text-secondary text-xs">Visión nocturna infrarroja activa</div>
                             </div>
-                            <button type="button" class="icon-btn text-cyan" onclick="showToast('Maximizando Patio Trasero')">
+                            <button type="button" class="icon-btn text-cyan"
+                                onclick="showToast('Maximizando Patio Trasero')">
                                 <span class="material-symbols-rounded">fullscreen</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="md3-card camera-card camera-item recording">
+                    <div class="md3-card camera-card camera-item recording stagger-3">
                         <div class="camera-feed">
-                            <span class="status-badge rec">REC • CAM 03</span>
-                            <span class="material-symbols-rounded" style="font-size:48px; color:var(--border-input);">garage</span>
+                            <span class="status-badge rec"><span class="live-dot"
+                                    style="background-color:#FFFFFF;"></span>REC • CAM 03</span>
+                            <span class="material-symbols-rounded"
+                                style="font-size:48px; color:var(--border-input);">garage</span>
                         </div>
                         <div class="camera-info">
                             <div>
@@ -645,7 +1100,8 @@
                     </div>
                 </div>
 
-                <button type="button" class="md3-btn-primary mt-12" onclick="showToast('Buscando nuevas cámaras en Wi-Fi...')">
+                <button type="button" class="md3-btn-primary mt-12"
+                    onclick="showToast('Buscando nuevas cámaras en Wi-Fi...')">
                     <span class="material-symbols-rounded">add</span>
                     AÑADIR CÁMARA
                 </button>
@@ -721,10 +1177,17 @@
 
         <!-- OVERLAY ALERTA SOS -->
         <div id="alert-overlay" class="alert-overlay">
-            <span class="material-symbols-rounded" style="font-size:68px;">notifications_active</span>
-            <h2>¡ALERTA SOS TRANSMITIDA!</h2>
-            <p class="text-sm">Coordenadas GPS enviadas a la patrulla policial y a tus contactos de emergencia.</p>
-            <button type="button" class="md3-btn-primary" style="background:#FFFFFF; color:#E11D48;" onclick="cancelSOSAlert()">
+            <div class="radar-wave"></div>
+            <div class="radar-wave"></div>
+            <div class="radar-wave"></div>
+            <span class="material-symbols-rounded"
+                style="font-size:72px; position:relative; z-index:2;">notifications_active</span>
+            <h2 style="position:relative; z-index:2;">¡ALERTA SOS TRANSMITIDA!</h2>
+            <p class="text-sm" style="position:relative; z-index:2;">Coordenadas GPS enviadas a la patrulla policial y a
+                tus contactos de emergencia.</p>
+            <button type="button" class="md3-btn-primary"
+                style="background:#FFFFFF; color:#E11D48; position:relative; z-index:2; max-width:320px;"
+                onclick="cancelSOSAlert()">
                 <span class="material-symbols-rounded">close</span>
                 DESACTIVAR ALERTA SOS
             </button>
@@ -741,6 +1204,14 @@
         let sosInterval = null;
         let sosElapsed = 0;
         const circumference = 2 * Math.PI * 90;
+        let currentScreenId = 'auth-screen';
+
+        const screenOrder = {
+            'auth-screen': 0,
+            'home-screen': 1,
+            'profile-screen': 1,
+            'cameras-screen': 2
+        };
 
         function switchAuthTab(type) {
             document.getElementById('tab-login').classList.toggle('active', type === 'login');
@@ -749,24 +1220,101 @@
             document.getElementById('form-register').classList.toggle('active', type === 'register');
         }
 
-        function handleAuthSubmit(event, type) {
-            event.preventDefault();
-            const phone = document.getElementById(type === 'register' ? 'reg-phone' : 'login-phone').value.trim();
-            const name = type === 'register'
-                ? (document.getElementById('reg-name').value.trim() || 'Usuario')
-                : (document.getElementById('profile-name-display').textContent || 'Usuario');
-
-            document.getElementById('home-greeting').textContent = `Hola, ${name}`;
-            document.getElementById('profile-name-display').textContent = name;
-            document.getElementById('profile-phone-display').textContent = phone;
-
-            navigateTo('home-screen');
-            showToast(type === 'register' ? `¡Bienvenido, ${name}!` : 'Sesión iniciada correctamente');
+        function triggerFieldShake(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const container = el.closest('.md3-text-field') || el;
+            container.classList.remove('shake-error');
+            void container.offsetWidth; // re-flow
+            container.classList.add('shake-error');
+            setTimeout(() => container.classList.remove('shake-error'), 450);
         }
 
-        function navigateTo(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+        async function handleAuthSubmit(event, type) {
+            event.preventDefault();
+
+            if (type === 'register') {
+                const name = document.getElementById('reg-name').value.trim();
+                const phone = document.getElementById('reg-phone').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                const password = document.getElementById('reg-password').value.trim();
+
+                if (!name) { triggerFieldShake('reg-name'); showToast('Ingresa tu nombre completo'); return; }
+                if (!phone) { triggerFieldShake('reg-phone'); showToast('Ingresa tu teléfono'); return; }
+                if (!email) { triggerFieldShake('reg-email'); showToast('Ingresa tu correo electrónico'); return; }
+                if (!password) { triggerFieldShake('reg-password'); showToast('Ingresa una contraseña'); return; }
+
+                try {
+                    const resp = await fetch('http://localhost:5000/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, phone, password })
+                    });
+                    const data = await resp.json();
+                    if (!resp.ok || !data.success) {
+                        showToast(data.message || 'Error al registrar en BD');
+                        return;
+                    }
+                    setUserData(data.user.name, data.user.email || data.user.phone);
+                    showToast(`¡Cuenta registrada en PostgreSQL! Bienvenido, ${data.user.name}`);
+                } catch (e) {
+                    setUserData(name || 'Usuario', email);
+                    showToast(`Bienvenido, ${name} (modo local)`);
+                }
+            } else {
+                const email = document.getElementById('login-email').value.trim();
+                const password = document.getElementById('login-password').value.trim();
+
+                if (!email) { triggerFieldShake('login-email'); showToast('Ingresa tu correo electrónico'); return; }
+                if (!password) { triggerFieldShake('login-password'); showToast('Ingresa tu contraseña'); return; }
+
+                try {
+                    const resp = await fetch('http://localhost:5000/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await resp.json();
+                    if (!resp.ok || !data.success) {
+                        triggerFieldShake('login-password');
+                        showToast(data.message || 'Contraseña o usuario incorrecto');
+                        return;
+                    }
+                    setUserData(data.user.name, data.user.email || data.user.phone);
+                    showToast(`Sesión iniciada con éxito en PostgreSQL`);
+                } catch (e) {
+                    setUserData('Administrador', email);
+                    showToast('Sesión iniciada (modo local)');
+                }
+            }
+
+            navigateTo('home-screen', 'forward');
+        }
+
+        function setUserData(name, phone) {
+            document.getElementById('home-greeting').textContent = `Hola, ${name.split(' ')[0]}`;
+            document.getElementById('profile-name-display').textContent = name;
+            document.getElementById('profile-phone-display').textContent = phone;
+        }
+
+        function navigateTo(screenId, forcedDirection = null) {
+            if (screenId === currentScreenId && document.getElementById(screenId).classList.contains('active')) return;
+
+            let direction = forcedDirection;
+            if (!direction) {
+                const prevOrder = screenOrder[currentScreenId] ?? 0;
+                const nextOrder = screenOrder[screenId] ?? 1;
+                direction = nextOrder >= prevOrder ? 'forward' : 'backward';
+            }
+
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active', 'entering-forward', 'entering-backward');
+            });
+
+            const target = document.getElementById(screenId);
+            target.classList.add('active');
+            target.classList.add(direction === 'forward' ? 'entering-forward' : 'entering-backward');
+            currentScreenId = screenId;
 
             const nav = document.getElementById('global-nav');
             if (screenId === 'home-screen' || screenId === 'profile-screen') {
@@ -794,21 +1342,25 @@
         }
 
         function logout() {
-            document.getElementById('reg-pin').value = '';
-            document.getElementById('login-pin').value = '';
-            navigateTo('auth-screen');
-            showToast('Has cerrado sesión');
+            const passInputs = document.querySelectorAll('input[type="password"]');
+            passInputs.forEach(i => i.value = '');
+            navigateTo('auth-screen', 'backward');
+            showToast('Has cerrado sesión con éxito');
         }
 
         function showToast(msg) {
             const toast = document.getElementById('md3-toast');
             document.getElementById('toast-text').textContent = msg;
+            toast.classList.remove('show');
+            void toast.offsetWidth; // re-flow para reiniciar animación
             toast.classList.add('show');
             clearTimeout(window._toastTimer);
-            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
         }
 
-        // Botón SOS 3 segundos
+        // =========================================================================
+        // BOTÓN SOS: ESTADOS DE REPOSO, INTERACCIÓN Y ACCIÓN (3 SEGUNDOS)
+        // =========================================================================
         const btnSos = document.getElementById('btnSos');
         const circle = document.getElementById('progress-circle');
         const statusLabel = document.getElementById('sos-status-label');
@@ -816,23 +1368,28 @@
         function startSosHold(e) {
             e.preventDefault();
             cancelSosHold();
+            btnSos.classList.add('holding');
             sosElapsed = 0;
             sosInterval = setInterval(() => {
                 sosElapsed += 50;
                 const progress = Math.min(sosElapsed / 3000, 1);
                 circle.style.strokeDashoffset = circumference * (1 - progress);
                 const rem = Math.max(1, Math.ceil((3000 - sosElapsed) / 1000));
-                statusLabel.textContent = `Enviando alerta en ${rem}s...`;
+                statusLabel.textContent = `¡ENVIANDO ALERTA EN ${rem}s!`;
                 if (sosElapsed >= 3000) {
                     cancelSosHold();
                     document.getElementById('alert-overlay').classList.add('active');
+                    showToast('¡Alerta transmitida a la Central Policial!');
                 }
             }, 50);
         }
 
         function cancelSosHold() {
-            clearInterval(sosInterval);
-            sosInterval = null;
+            btnSos.classList.remove('holding');
+            if (sosInterval) {
+                clearInterval(sosInterval);
+                sosInterval = null;
+            }
             circle.style.strokeDashoffset = circumference;
             statusLabel.textContent = 'Mantén pulsado 3 segundos';
         }
@@ -843,10 +1400,28 @@
         }
 
         btnSos.addEventListener('mousedown', startSosHold);
-        btnSos.addEventListener('touchstart', startSosHold);
+        btnSos.addEventListener('touchstart', startSosHold, { passive: false });
         btnSos.addEventListener('mouseup', cancelSosHold);
         btnSos.addEventListener('mouseleave', cancelSosHold);
         btnSos.addEventListener('touchend', cancelSosHold);
+
+        // =========================================================================
+        // MATERIAL RIPPLE EFFECT (ONDA EXPANSIVA AL INTERACTUAR / ACCIÓN)
+        // =========================================================================
+        document.addEventListener('click', function (e) {
+            const target = e.target.closest('.md3-btn-primary, .md3-btn-secondary, .action-card, .tab-btn, .md3-chip, .list-card');
+            if (!target) return;
+            const rect = target.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.className = 'md3-ripple';
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+            ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+            target.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
     </script>
 </body>
+
 </html>

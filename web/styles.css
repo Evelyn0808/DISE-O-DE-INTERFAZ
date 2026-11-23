@@ -216,18 +216,44 @@ body {
     box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
 }
 
-/* Pantallas y Formularios */
+/* Pantallas y Formularios (MD3 Expressive Motion) */
 .auth-form, .screen {
     display: none;
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    will-change: transform, opacity;
 }
 
 .auth-form.active, .screen.active {
     display: block;
     opacity: 1;
-    transform: translateY(0);
+}
+
+.screen.entering-forward {
+    animation: screenSlideForward 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.screen.entering-backward {
+    animation: screenSlideBackward 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes screenSlideForward {
+    0% { opacity: 0; transform: translateX(45px) scale(0.96); filter: blur(4px); }
+    100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+
+@keyframes screenSlideBackward {
+    0% { opacity: 0; transform: translateX(-45px) scale(0.96); filter: blur(4px); }
+    100% { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+
+/* Cascada de micro-animaciones al entrar */
+.screen.active .stagger-1 { animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.04s; }
+.screen.active .stagger-2 { animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.10s; }
+.screen.active .stagger-3 { animation: staggerSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both 0.16s; }
+
+@keyframes staggerSlideIn {
+    0% { opacity: 0; transform: translateY(18px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .screen.with-nav {
